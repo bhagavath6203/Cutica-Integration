@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Class View Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.user-info {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.class-info {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.examples-header, .autoresponses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.example, .autoresponse {
+    background-color: #fff;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.example-content, .autoresponse-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.example-header, .autoresponse-header {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.delete-btn, .edit-btn {
+    background-color: #ffa500;
+    width: auto;
+    color: black;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-left: 10px;
+}
+
+.delete-btn:hover, .edit-btn:hover {
+    background-color: #ff8c00;
+    transform: scale(1.05);
+}
+
+.delete-btn:hover {
+    background-color: #ff6347;
+}
+
+.add-btn, .add-autoresponse-btn {
+    background-color: #ffa500;
+    width: auto;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-weight: bold;
+}
+
+.add-btn:hover, .add-autoresponse-btn:hover {
+    background-color: #ff8c00;
+    transform: scale(1.05);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover, .close:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input[type="text"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+form button[type="submit"] {
+    background-color: #ffa500;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+form button[type="submit"]:hover {
+    background-color: #ff8c00;
+    transform: scale(1.05);
+}
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="CuTicA Logo"
+                style="width: 100px; height: auto;">
+        </div>
+        <ul>
+            <li><a href="{{ url_for('auth.dashboard_page') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('auth.customers_page') }}"><i class="fas fa-users"></i> Customers</a></li>
+            <li ><a href="{{ url_for('auth.support_team') }}"><i class="fas fa-ticket-alt"></i> Support Team</a></li>
+            <li class="active"><a href="{{ url_for('auth.account_page') }}"><i class="fas fa-user"></i> Account</a></li>
+            <li><a href="{{ url_for('auth.notification_page') }}"><i class="fas fa-bell"></i> Notification</a></li>
+            <li><a href="{{ url_for('auth.settings_page') }}"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="{{ url_for('auth.help_page') }}"><i class="fas fa-question-circle"></i> Help</a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="user-info">
+            <span>Hello {{ session['username'] }}, Administrator</span>
+        </div>
+        <h1>Class Details</h1>
+
+        {% if class_details %}
+        <div class="class-info" data-class-id="{{ class_details.class_id }}">
+            <h2>Class ID: {{ class_details.class_id }}</h2>
+            <h2>Class Name: {{ class_details.class_name }}</h2>
+        </div>
+        {% else %}
+        <p>No class details available.</p>
+        {% endif %}
+
+        <div class="examples">
+            <div class="examples-header">
+                <h2>Examples</h2>
+                <button class="add-btn" id="addExampleBtn"><i class="fas fa-plus"></i> Add Example</button>
+            </div>
+
+            {% if examples %}
+            {% for example in examples %}
+            <div class="example">
+                <div class="example-content">
+                    <div class="example-header">
+                        <span><strong>#{{ loop.index }}</strong></span>
+                        <span class="example-text">{{ example.example_data }}</span>
+                    </div>
+                    <div>
+                        <button class="edit-btn" data-example-id="{{ example._id }}">Edit</button>
+                        <button class="delete-btn" data-example-id="{{ example._id }}">Delete</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No examples found.</p>
+            {% endif %}
+        </div>
+
+        <div class="autoresponses">
+            <div class="autoresponses-header">
+                <h2>Autoresponses</h2>
+                <button class="add-autoresponse-btn" id="addAutoresponseBtn"><i class="fas fa-plus"></i> Add
+                    Autoresponse</button>
+            </div>
+
+            {% if autoresponses %}
+            {% for autoresponse in autoresponses %}
+            <div class="autoresponse">
+                <div class="autoresponse-content">
+                    <div class="autoresponse-header">
+                        <span><strong>#{{ loop.index }}</strong></span>
+                        <span class="autoresponse-text">{{ autoresponse.response }}</span>
+                    </div>
+                    <div>
+                        <button class="edit-autoresponse-btn"
+                            data-autoresponse-id="{{ autoresponse._id }}">Edit</button>
+                        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No autoresponses found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Add Example Modal -->
+        <div id="exampleModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <form id="addExampleForm" action="{{ url_for('auth.add_example', class_id=class_details.class_id) }}"
+                    method="POST">
+                    <label for="example_data">Example:</label>
+                    <input type="text" id="example_data" name="example_data" placeholder="Enter example" required>
+                    <button type="submit">Add Example</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Autoresponse Modal -->
+        <div id="autoresponseModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <form id="addAutoresponseForm"
+                    action="{{ url_for('auth.add_autoresponse', class_id=class_details.class_id) }}" method="POST">
+                    <label for="autoresponse_data">Autoresponse:</label>
+                    <input type="text" id="autoresponse_data" name="autoresponse_data" placeholder="Enter autoresponse"
+                        required>
+                    <button type="submit">Add Autoresponse</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addExampleForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitForm(this, 'example');
+        });
+
+        document.getElementById('addAutoresponseForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitForm(this, 'autoresponse');
+        });
+
+        function submitForm(form, type) {
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); // Reload the page to show the new item
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const classId = document.querySelector('.class-info').getAttribute('data-class-id');
+
+            // Function to handle edit operations
+            function handleEdit(endpoint, idAttribute, textSelector) {
+                return function () {
+                    const id = this.getAttribute(idAttribute);
+                    const contentElement = this.closest('.example-content, .autoresponse-content');
+                    const textElement = contentElement.querySelector(textSelector);
+                    const currentText = textElement.textContent.trim();
+                    const newText = prompt('Edit:', currentText);
+
+                    if (newText && newText !== currentText) {
+                        fetch(`${endpoint}/${classId}/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ data: newText })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    textElement.textContent = newText;
+                                    alert('Updated successfully');
+                                } else {
+                                    alert('Failed to update: ' + (data.error || 'Unknown error'));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while updating. Please try again.');
+                            });
+                    }
+                };
+            }
+
+            // Function to handle delete operations
+            function handleDelete(endpoint, idAttribute, elementSelector) {
+                return function () {
+                    const id = this.getAttribute(idAttribute);
+                    const element = this.closest(elementSelector);
+
+                    if (confirm('Are you sure you want to delete this?')) {
+                        fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: id,
+                                class_id: classId
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    element.remove();
+                                    alert('Deleted successfully');
+                                } else {
+                                    alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while deleting. Please try again.');
+                            });
+                    }
+                };
+            }
+
+            // Attach event listeners
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', handleEdit('/edit_example', 'data-example-id', '.example-text'));
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', handleDelete('/delete_example', 'data-example-id', '.example'));
+            });
+
+            document.querySelectorAll('.edit-autoresponse-btn').forEach(button => {
+                button.addEventListener('click', handleEdit('/edit_autoresponse', 'data-autoresponse-id', '.autoresponse-text'));
+            });
+
+            document.querySelectorAll('.delete-autoresponse-btn').forEach(button => {
+                button.addEventListener('click', handleDelete('/delete_autoresponse', 'data-autoresponse-id', '.autoresponse'));
+            });
+
+            // Modal functionality
+            const exampleModal = document.getElementById('exampleModal');
+            const autoresponseModal = document.getElementById('autoresponseModal');
+            const addExampleBtn = document.getElementById('addExampleBtn');
+            const addAutoresponseBtn = document.getElementById('addAutoresponseBtn');
+            const closeBtns = document.getElementsByClassName('close');
+
+            addExampleBtn.onclick = function () {
+                exampleModal.style.display = 'block';
+            }
+
+            addAutoresponseBtn.onclick = function () {
+                autoresponseModal.style.display = 'block';
+            }
+
+            Array.from(closeBtns).forEach(btn => {
+                btn.onclick = function () {
+                    exampleModal.style.display = 'none';
+                    autoresponseModal.style.display = 'none';
+                }
+            });
+
+            window.onclick = function (event) {
+                if (event.target == exampleModal) {
+                    exampleModal.style.display = 'none';
+                }
+                if (event.target == autoresponseModal) {
+                    autoresponseModal.style.display = 'none';
+                }
+            }
+
+            // Function to get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+</body>
+</html>
